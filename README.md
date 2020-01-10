@@ -15,3 +15,9 @@ In-Progress: Currently at lecture 126
 We need a separate dev container for each of these three items. So that when we make changes to on of them, only that single container gets rebuilt
 
 ![image](https://user-images.githubusercontent.com/9342308/72027407-e8a12680-324c-11ea-9f24-1ed1bcadcc77.png)
+
+### Nginx Splits client (React Server) vs server (Express)
+
+Note: Client and Server (on right) are considered "upstream"
+
+![image](https://user-images.githubusercontent.com/9342308/72192957-8f183380-33d5-11ea-86dd-eb054c0aceda.png)
