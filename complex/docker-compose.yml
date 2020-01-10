@@ -1,0 +1,16 @@
+version: "3"
+services:
+    postgres:
+        image: "postgres:latest"
+    redis:
+        image: "redis:latest"
+    server:
+        build:
+            dockerfile: Dockerfile.dev
+            # Look in the "server" directory
+            context: ./server
+        volumes:
+            # Leave this folder as-is
+            - /app/node_modules
+            # When container tries to access anything in /app (except node_modules above), then redirect to ./server outside container
+            - ./server:/app
