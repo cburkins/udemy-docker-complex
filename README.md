@@ -25,3 +25,5 @@ Note: Client and Server (on right) are considered "upstream"
 NOTE: React Server is different, now separate Nginx that is simply serving static files
 
 ![image](https://user-images.githubusercontent.com/9342308/72203509-7857f800-343a-11ea-9acc-6049b8d7e6f7.png)
+
+### Built .travis.yml that builds images and pushes them to Docker Hub
