@@ -4,6 +4,17 @@ services:
         image: "postgres:latest"
     redis:
         image: "redis:latest"
+    nginx:
+        restart: always
+        build:
+            dockerfile: Dockerfile.dev
+            context: ./nginx
+        ports:
+            - "3050:80"
+        depends_on:
+            - api
+            - client
+
     # This used to be called "server", but we modified to avoid keyword conflict within nginx/default.conf
     api:
         build:
@@ -24,6 +35,8 @@ services:
             - PGDATABASE=postgres
             - PGPASSWORD=postgres_password
             - PGPORT=5432
+        depends_on:
+            - postgres
     client:
         build:
             dockerfile: Dockerfile.dev
@@ -38,3 +51,6 @@ services:
         volumes:
             - /app/node_modules
             - ./worker:/app
+        environment:
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
