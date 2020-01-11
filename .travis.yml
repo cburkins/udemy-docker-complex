@@ -3,3 +3,26 @@ services:
     - docker
 
 before_install:
+    # Build the Dev image because it has all the dependencies required for running React tests
+    - docker build -t cburkins/react-test -f ./client/Dockerfile.dev ./client
+
+# If any of these scripts exit with a non-zero return code, Travis will assume failure and stop
+script:
+    # override startup command with "npm test -- --coverage"
+    # "-- --coverage" will cause the test to actually exit (React test normally does not exit)
+    - docker run cburkins/react-test npm test -- --coverage
+
+# Runs if all scripts exit with zero
+# This is where we build product production images
+after_success:
+    - docker build -t cburkins/multi-client ./client
+    - docker build -t cburkins/multi-nginx ./nginx
+    - docker build -t cburkins/multi-server ./server
+    - docker build -t cburkins/multi-worker ./worker
+    # Log in to the docker CLI (using Travis encrypted environment variables)
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+    # Push the new images to docker hub
+    - docker push cburkins/multi-client
+    - docker push cburkins/multi-nginx
+    - docker push cburkins/multi-server
+    - docker push cburkins/multi-worker
