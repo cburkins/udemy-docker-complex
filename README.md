@@ -1,7 +1,5 @@
 # udemy-docker-complex
 
-In-Progress: Currently at lecture 126
-
 ### Basic Architecture
 
 ![image](https://user-images.githubusercontent.com/9342308/72189583-3348ad00-33cb-11ea-8e97-6edd3b947911.png)
@@ -21,3 +19,9 @@ We need a separate dev container for each of these three items. So that when we 
 Note: Client and Server (on right) are considered "upstream"
 
 ![image](https://user-images.githubusercontent.com/9342308/72192957-8f183380-33d5-11ea-86dd-eb054c0aceda.png)
+
+### Starting Production Build
+
+NOTE: React Server is different, now separate Nginx that is simply serving static files
+
+![image](https://user-images.githubusercontent.com/9342308/72203509-7857f800-343a-11ea-9acc-6049b8d7e6f7.png)
