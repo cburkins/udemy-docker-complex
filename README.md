@@ -128,3 +128,35 @@ By default, this services can't talk to each other (i.e. Elastic Beanstalk can't
 1. VPC ID: Select your default VPC
 
 #### Creating Security Group
+
+1. In AWS, go to VPC or EC2, select "Security Groups" on left
+1. Click on "Create Security Group"
+1. Security Group Name: multi-docker
+1. VPC: [select your default VPC]
+1. Click Create
+1. Go to Inbound Rules
+1. Create
+1. Custom TCP Rule, TCP, Ports 5432-6379, Source=thisSecurityGroup
+
+Now apply this new security group (named "multi-docker") to all three instances (ElastiCache, RDS instance, and Elastic Beanstalk Instance)
+
+For example....
+
+![image](https://user-images.githubusercontent.com/9342308/72212919-353a6b00-34b4-11ea-851c-2a76b0d2556e.png)
+
+#### Update ElasticBeanstalk with Environment Variables
+
+<b>NOTE: AWS does not obfuscate these values, so your database password will be visibile to other's who have access to this screen in your AWS Account</b>
+
+1. On AWS, go to Elastic Beanstalk
+1. Open the correct environment
+1. On left, click on "Configuration"
+1. On "Software" category, click "Modify"
+1. Scroll down to Environment Properties
+    1. REDIS_HOST (this is "Primary Endpoint" from ElastiCache config screen, removing ":6379" at end )
+    1. REDIS_PORT
+    1. PGUSER
+    1. PGPASSWORD
+    1. PGHOST (this is "Endpoint" from RDS config screen)
+    1. PGDATABASE
+    1. PGPORT
