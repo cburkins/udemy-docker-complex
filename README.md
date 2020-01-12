@@ -1,10 +1,24 @@
 # udemy-docker-complex
 
-### Basic Architecture
+### Background
+
+This repo is part of the Udemy course on Docker and Kubernetes, the instructor was Stephen Grider. The included exercises were:
+
+1. simpleweb (Repo 1): Publishes a single-container simple web app using Node
+1. visits: (Repo 1) Two containers, Simple web server using Node, displays the number of visits (page views ?). Keeps track in second container running redis. Uses docker-compose to start both containers and allow them to talk with each other
+1. Flow using Travis: (Repo 1) Has it's own README Somewhat more complicated workflow.
+1. React using Travis (Repo 2)
+1. Complex Multi-Container Fibonacci Calcuator <b>(Repo 3 : This Repo)</b>
+
+### Description
+
+This Repo, the Fibonacci calculator is a purposely overly-complex example of using multiple containers that talk with each other, get built via Travis CI, and get deployed to AWS Elastic Beanstalk
+
+### Basic Architecture for Fibonacci Calculator
 
 ![image](https://user-images.githubusercontent.com/9342308/72027322-88aa8000-324c-11ea-8fb6-9e8d8186ca71.png)
 
-### Dev Environments
+### Dev Build
 
 We need a separate dev container for each of these three items. So that when we make changes to on of them, only that single container gets rebuilt
 
@@ -15,6 +29,77 @@ We need a separate dev container for each of these three items. So that when we 
 Note: Client and Server (on right) are considered "upstream"
 
 ![image](https://user-images.githubusercontent.com/9342308/72192957-8f183380-33d5-11ea-86dd-eb054c0aceda.png)
+
+### docker-compose for Dev Build
+
+Dev environment (on your local machine) is defined by several "Dockerfile.dev" files, and one "docker-compose.yml" file
+
+##### docker-compose.yml
+
+```yaml
+version: "3"
+services:
+    postgres:
+        image: "postgres:latest"
+    redis:
+        image: "redis:latest"
+    nginx:
+        restart: always
+        build:
+            dockerfile: Dockerfile.dev
+            context: ./nginx
+        ports:
+            - "3050:80"
+        depends_on:
+            - api
+            - client
+
+    # This used to be called "server", but we modified to avoid keyword conflict within nginx/default.conf
+    api:
+        build:
+            dockerfile: Dockerfile.dev
+            # Look in the "server" directory
+            context: ./server
+        volumes:
+            # Leave this folder as-is
+            - /app/node_modules
+            # When container tries to access anything in /app (except node_modules above) =  then redirect to ./server outside container
+            - ./server:/app
+        environment:
+            # We can reference the named service defined above
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - PGUSER=postgres
+            - PGHOST=postgres
+            - PGDATABASE=postgres
+            - PGPASSWORD=postgres_password
+            - PGPORT=5432
+        depends_on:
+            - postgres
+    client:
+        build:
+            dockerfile: Dockerfile.dev
+            context: ./client
+        volumes:
+            - /app/node_modules
+            - ./client:/app
+    worker:
+        build:
+            dockerfile: Dockerfile.dev
+            context: ./worker
+        volumes:
+            - /app/node_modules
+            - ./worker:/app
+        environment:
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+```
+
+### Starting Dev Environment
+
+1. clone this repo to your local machine
+1. run "docker-compose up"
+1. Publishes a React App on http://localhost:3050 (configured in docker-compose.yml)
 
 ### Production Build
 
