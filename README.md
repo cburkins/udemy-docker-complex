@@ -79,3 +79,52 @@ NOTE: React Server is different, now separate Nginx that is simply serving stati
 1. Create Environment within Application
 1. Pre-configured platform: Multi-container Docker
 1. Application code: Sample Application
+
+### Running Production Databases
+
+Instructor recommends using outside data services (e.g. AWS ElastiCache or RDS) rather than your own container
+
+1. More scalable than your own Redis within a container
+1. Built-in logging and maintenance
+1. Probably better data security than we can do
+1. Automatic backups and rollbacks (RDS Relational Database Service)
+1. Easier to migrate off of EB
+
+NOTE: Next project in this course will setup production database in a docker container
+
+![image](https://user-images.githubusercontent.com/9342308/72212545-1932cb80-34ac-11ea-9dc1-8de04122d8e3.png)
+
+By default, this services can't talk to each other (i.e. Elastic Beanstalk can't talk with ElastiCache or RDS)
+
+![image](https://user-images.githubusercontent.com/9342308/72212626-58ade780-34ad-11ea-95ba-6bf9c7d6eddf.png)
+
+#### Creating PostgreSQL database instance and database via RDS
+
+1. Log into AWS
+1. Select RDS
+1. Scroll down to "Create Database" section
+1. Click on "Create Database" button
+
+    ![image](https://user-images.githubusercontent.com/9342308/72212705-e4744380-34ae-11ea-96ec-a0716c457415.png)
+
+1. Click on "PostgreSQL"
+1. Under templates, click on "Free Tier" (uses t2.micro for instance, cheaper)
+1. DB instance identifier: multi-docker-postgres
+1. Master username: postgres
+1. Master password: <b>[be sure to remember this]</b>
+1. Under Connectivity: Make sure publicy-accessible is NOT checked
+1. Under Additional Configuration: set "database name", otherwise AWS will simply create the database instance, and not an actual database (for this example, using "fibvalues")
+
+#### Creating an AWS ElastiCache Cluster Instance (Redis)
+
+1. Log into AWS, Select "ElastiCache" service
+1. Click on "Redis" on the left
+1. Click on "Create"
+1. Name: multi-docker-redis
+1. <b>Select Node Type</b> as "cache.t2.micro"
+1. Number of Replicas: change from 2 to 0
+1. Subnet group: Create New
+1. Name: redis-group (not important)
+1. VPC ID: Select your default VPC
+
+#### Creating Security Group
