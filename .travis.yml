@@ -27,6 +27,8 @@ after_success:
     - docker push cburkins/multi-server
     - docker push cburkins/multi-worker
 
+# I think this section depends on "Dockerrun.aws.json" within our repo, which specifies the Docker builds on the AWS side
+# To debug, first check Travis CI status of build, then go to AWS Elastic Beanstalk and check Dashboard to check status
 deploy:
     provider: elasticbeanstalk
     region: us-east-1
