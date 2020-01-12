@@ -26,3 +26,15 @@ after_success:
     - docker push cburkins/multi-nginx
     - docker push cburkins/multi-server
     - docker push cburkins/multi-worker
+
+deploy:
+    provider: elasticbeanstalk
+    region: us-east-1
+    app: udemy-complex
+    env: UdemyComplex-env
+    bucket_name: elasticbeanstalk-us-east-1-745400479556
+    bucket_path: docker-multi
+    on:
+        branch: master
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY

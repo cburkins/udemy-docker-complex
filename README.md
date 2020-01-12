@@ -160,3 +160,12 @@ For example....
     1. PGHOST (this is "Endpoint" from RDS config screen)
     1. PGDATABASE
     1. PGPORT
+
+#### Configure deployment from Travis CI to AWS
+
+1. On AWS, go to IAM
+1. Create User, with programmatic access
+1. Attach existing policies directly
+1. Search for "Beanstalk", attach "AWSElasticBeanstalkFullAccess"
+1. Create (<b>saving Access and Secret Keys</b>)
+1. On Travis, within Github repo config, add envionrment variables for <b>AWS_ACCESS_KEY</b> and <b>AWS_SECRET_KEY</b>
