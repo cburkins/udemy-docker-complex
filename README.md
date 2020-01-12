@@ -2,10 +2,6 @@
 
 ### Basic Architecture
 
-![image](https://user-images.githubusercontent.com/9342308/72189583-3348ad00-33cb-11ea-8e97-6edd3b947911.png)
-
-### Basic Architecture
-
 ![image](https://user-images.githubusercontent.com/9342308/72027322-88aa8000-324c-11ea-8fb6-9e8d8186ca71.png)
 
 ### Dev Environments
@@ -20,15 +16,72 @@ Note: Client and Server (on right) are considered "upstream"
 
 ![image](https://user-images.githubusercontent.com/9342308/72192957-8f183380-33d5-11ea-86dd-eb054c0aceda.png)
 
-### Starting Production Build
+### Production Build
+
+1. Integrate Travis CI with our GitHub Repo (master branch)
+1. On any push into master, Travis CI will trigger, looking for <b>.travis.yml</b>
+1. Using those instructions, Travis CI will build our images, then upload Docker images to Docker Hub
+1. Upload entire repo to AWS Elastic Beanstalk via S3 Bucket
+1. EB will see Dockerrun.aws.json
+1. Using those instructions, EB will build containers from Docker Images
+1. And publish a URL
 
 NOTE: React Server is different, now separate Nginx that is simply serving static files
 
 ![image](https://user-images.githubusercontent.com/9342308/72203509-7857f800-343a-11ea-9acc-6049b8d7e6f7.png)
 
-### Built .travis.yml that builds images and pushes them to Docker Hub
+### Build .travis.yml that builds images and pushes them to Docker Hub
 
-### Dockerrun.aws.json
+Travis CI will build our images for us, then upload those Docker images to Docker Hub.
+
+##### .travis.yml
+
+```yml
+sudo: required
+services:
+    - docker
+
+before_install:
+    # Build the Dev image because it has all the dependencies required for running React tests
+    - docker build -t cburkins/react-test -f ./client/Dockerfile.dev ./client
+
+# If any of these scripts exit with a non-zero return code, Travis will assume failure and stop
+script:
+    # override startup command with "npm test -- --coverage"
+    # "-- --coverage" will cause the test to actually exit (React test normally does not exit)
+    - docker run cburkins/react-test npm test -- --coverage
+
+# Runs if all scripts exit with zero
+# This is where we build product production images
+after_success:
+    - docker build -t cburkins/multi-client ./client
+    - docker build -t cburkins/multi-nginx ./nginx
+    - docker build -t cburkins/multi-server ./server
+    - docker build -t cburkins/multi-worker ./worker
+    # Log in to the docker CLI (using Travis encrypted environment variables)
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+    # Push the new images to docker hub
+    - docker push cburkins/multi-client
+    - docker push cburkins/multi-nginx
+    - docker push cburkins/multi-server
+    - docker push cburkins/multi-worker
+
+# I think this section depends on "Dockerrun.aws.json" within our repo, which specifies the Docker builds on the AWS side
+# To debug, first check Travis CI status of build, then go to AWS Elastic Beanstalk and check Dashboard to check status
+deploy:
+    provider: elasticbeanstalk
+    region: us-east-1
+    app: udemy-complex
+    env: UdemyComplex-env
+    bucket_name: elasticbeanstalk-us-east-1-745400479556
+    bucket_path: docker-multi
+    on:
+        branch: master
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+```
+
+##### Dockerrun.aws.json
 
 -   At least one container must be "essential"
 -   "hostname" is optional for both worker and nginx, as other containers don't need to contact those containers
