@@ -27,3 +27,55 @@ NOTE: React Server is different, now separate Nginx that is simply serving stati
 ![image](https://user-images.githubusercontent.com/9342308/72203509-7857f800-343a-11ea-9acc-6049b8d7e6f7.png)
 
 ### Built .travis.yml that builds images and pushes them to Docker Hub
+
+### Dockerrun.aws.json
+
+-   At least one container must be "essential"
+-   "hostname" is optional for both worker and nginx, as other containers don't need to contact those containers
+-   docker-compose is better at implicit links/hostnames between containers. Must be defined in AWS ECS
+
+```json
+{
+    "AWSEBDockerrunVersion": 2,
+    "containerDefinitions": [
+        {
+            "name": "client",
+            "image": "cburkins/multi-client",
+            "hostname": "client",
+            "essential": false
+        },
+        {
+            "name": "server",
+            "image": "cburkins/multi-server",
+            "hostname": "api",
+            "essential": false
+        },
+        {
+            "name": "worker",
+            "image": "cburkins/multi-worker",
+            "hostname": "worker",
+            "essential": false
+        },
+        {
+            "name": "nginx",
+            "image": "cburkins/multi-nginx",
+            "hostname": "nginx",
+            "essential": true,
+            "portMappings": [
+                {
+                    "hostPort": 80,
+                    "containerPort": 80
+                }
+            ],
+            "links": ["client", "server"]
+        }
+    ]
+}
+```
+
+### Creating Elastic Beanstalk Application
+
+1. Create Application
+1. Create Environment within Application
+1. Pre-configured platform: Multi-container Docker
+1. Application code: Sample Application
