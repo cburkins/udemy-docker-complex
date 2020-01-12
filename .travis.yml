@@ -8,9 +8,9 @@ before_install:
 
 # If any of these scripts exit with a non-zero return code, Travis will assume failure and stop
 script:
-    # override startup command with "npm test -- --coverage"
-    # "-- --coverage" will cause the test to actually exit (React test normally does not exit)
-    - docker run cburkins/react-test npm test -- --coverage
+    # override startup command with "npm test"
+    # CI=true will cause the test to execute rather than never finish and prompting for input
+    - docker run -e CI=true cburkins/react-test npm test
 
 # Runs if all scripts exit with zero
 # This is where we build product production images
