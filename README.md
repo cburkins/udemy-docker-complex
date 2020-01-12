@@ -169,3 +169,16 @@ For example....
 1. Search for "Beanstalk", attach "AWSElasticBeanstalkFullAccess"
 1. Create (<b>saving Access and Secret Keys</b>)
 1. On Travis, within Github repo config, add envionrment variables for <b>AWS_ACCESS_KEY</b> and <b>AWS_SECRET_KEY</b>
+1. Commit Repo, which will trigger Travis CI, which will then trigger AWS Elastic Beanstalk
+1. AWS EB Debugging: On left, click on "Logs", then "Request Logs", which will show you last 100 lines from each EC2 Instance
+1. <b>URL for the new app is at the very top of Elastic Beanstalk screen (see screenshot)</b>
+1. Looks like it created a single EC2 t2.micro instance, with zero load balancers (more efficient than I thought)
+
+Travis CI Completed Build
+![image](https://user-images.githubusercontent.com/9342308/72218610-a573db80-350a-11ea-8fa4-b0181ce2fdef.png)
+
+Elastic Beanstalk Completed Build
+![image](https://user-images.githubusercontent.com/9342308/72218677-8fb2e600-350b-11ea-91c2-2bbfa8ca969c.png)
+
+Screenshot of EC2 Instances (Only one)
+![image](https://user-images.githubusercontent.com/9342308/72218707-e6202480-350b-11ea-9057-3f2aae2a8179.png)
