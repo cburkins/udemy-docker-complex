@@ -265,6 +265,22 @@ By default, this services can't talk to each other (i.e. Elastic Beanstalk can't
 1. Name: redis-group (not important)
 1. VPC ID: Select your default VPC
 
+NOTE: This can also be creating via command-line, experimenting with that now:
+
+```
+Create a Redis Elasticache Cluster:
+aws elasticache create-cache-cluster --engine redis --cache-cluster-id multi-docker-redis --cache-node-type "cache.t2.micro" --num-cache-nodes 1
+
+List the Redis Clusters ("CacheClusterStatus" should eventually be "available"):
+aws elasticache describe-cache-clusters
+
+Or for a fancier listing:
+aws elasticache describe-cache-clusters --query 'CacheClusters[*].{ID:CacheClusterId,Status:CacheClusterStatus,NodeType:CacheNodeType}' --output table
+
+
+
+```
+
 #### Creating Security Group
 
 1. In AWS, go to VPC or EC2, select "Security Groups" on left
